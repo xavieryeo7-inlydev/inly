@@ -3,50 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INLY - Pages de vente professionnelles</title>
+    <title>INLY - Pages de vente professionnelles pour vendeurs WhatsApp</title>
+    <meta name="description" content="Créez votre page de vente en ligne en quelques minutes. Solution simple et efficace pour vendeurs WhatsApp en Côte d'Ivoire.">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+        
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .hero-content {
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
-            line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
-        h1 {
-            color: #25D366;
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
         }
-        a {
-            color: #25D366;
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
             text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        a:hover {
-            text-decoration: underline;
+        
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
         }
-        .vendor-list {
-            list-style: none;
-            padding: 0;
-        }
-        .vendor-list li {
-            padding: 15px;
-            margin: 10px 0;
+        
+        /* FEATURED VENDORS (Mis en avant / Pub) */
+        .featured {
             background: #f8f9fa;
+            padding: 40px 20px;
+        }
+        
+        .featured h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .featured-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        
+        .featured-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .featured-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .featured-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #FF6B35;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+        
+        .featured-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .featured-content {
+            padding: 24px;
+        }
+        
+        .featured-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        
+        .featured-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .featured-link {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 12px 24px;
             border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .featured-link:hover {
+            background: #1da851;
+        }
+        
+        /* ALL VENDORS */
+        .vendors {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        .vendors h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #1a1a1a;
+        }
+        
+        .vendors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .vendor-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #1a1a1a;
+            display: block;
+        }
+        
+        .vendor-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+        
+        .vendor-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+        
+        .vendor-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .vendor-category {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #25D366;
+        }
+        
+        .footer p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .footer-cta {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 30px;
+            transition: background 0.3s;
+        }
+        
+        .footer-cta:hover {
+            background: #1da851;
+        }
+        
+        .footer-bottom {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .vendors-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>INLY - Pages de vente professionnelles</h1>
-    <p>Bienvenue sur INLY. Découvrez nos vendeurs :</p>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Vendez en ligne simplement avec INLY</h1>
+            <p>Créez votre page de vente professionnelle en quelques minutes. Vos clients commandent directement sur WhatsApp.</p>
+            <a href="https://wa.me/2250715884979?text=Bonjour%20INLY%20!%20Je%20veux%20créer%20ma%20page%20de%20vente" class="cta-btn" target="_blank">
+                💬 Créer ma page maintenant
+            </a>
+        </div>
+    </section>
     
-    <ul class="vendor-list">
-        <li><a href="vendors/vendor1-aminata-mode/">Aminata Mode - Vêtements féminins</a></li>
-        <li><a href="vendors/vendor2-bakary-tech/">Bakary Tech - Électronique</a></li>
-        <li><a href="vendors/vendor3-fatoumata-bijoux/">Fatoumata Bijoux - Bijoux artisanaux</a></li>
-        <li><a href="vendors/vendor4-marie-epicerie/">Marie Épicerie - Produits alimentaires</a></li>
-        <li><a href="vendors/vendor5-ibrahim-electronique/">Ibrahim Électronique - Appareils électroniques</a></li>
-    </ul>
+    <!-- FEATURED VENDORS (Vendeurs mis en avant / Pub) -->
+    <section class="featured">
+        <h2>Vendeurs en vedette</h2>
+        <p class="featured-subtitle">Découvrez nos vendeurs mis en avant ce mois-ci</p>
+        
+        <div class="featured-grid">
+            <!-- Vendeur mis en avant 1 -->
+            <div class="featured-card">
+                <div class="featured-badge">⭐ Premium</div>
+                <div class="featured-image">👗</div>
+                <div class="featured-content">
+                    <h3 class="featured-title">Aminata Mode</h3>
+                    <p class="featured-description">Vêtements féminins tendance à Abidjan. Collection exclusive de robes, ensembles et accessoires.</p>
+                    <a href="vendors/vendor1-aminata-mode/" class="featured-link">Voir la boutique →</a>
+                </div>
+            </div>
+            
+            <!-- Vendeur mis en avant 2 -->
+            <div class="featured-card">
+                <div class="featured-badge">🔥 Populaire</div>
+                <div class="featured-image">💎</div>
+                <div class="featured-content">
+                    <h3 class="featured-title">Fatoumata Bijoux</h3>
+                    <p class="featured-description">Bijoux artisanaux haut de gamme. Pièces uniques faites main avec passion.</p>
+                    <a href="vendors/vendor3-fatoumata-bijoux/" class="featured-link">Voir la boutique →</a>
+                </div>
+            </div>
+            
+            <!-- Vendeur mis en avant 3 -->
+            <div class="featured-card">
+                <div class="featured-badge">✨ Nouveau</div>
+                <div class="featured-image">📱</div>
+                <div class="featured-content">
+                    <h3 class="featured-title">Ibrahim Électronique</h3>
+                    <p class="featured-description">Smartphones, accessoires et appareils électroniques de qualité à prix compétitifs.</p>
+                    <a href="vendors/vendor5-ibrahim-electronique/" class="featured-link">Voir la boutique →</a>
+                </div>
+            </div>
+        </div>
+    </section>
     
-    <hr>
-    <p><small>Vous souhaitez créer votre page ? <a href="https://wa.me/2250715884979">Contactez-nous sur WhatsApp</a></small></p>
+    <!-- ALL VENDORS -->
+    <section class="vendors">
+        <h2>Tous nos vendeurs</h2>
+        
+        <div class="vendors-grid">
+            <a href="vendors/vendor1-aminata-mode/" class="vendor-card">
+                <div class="vendor-icon">👗</div>
+                <div class="vendor-name">Aminata Mode</div>
+                <div class="vendor-category">Vêtements féminins</div>
+            </a>
+            
+            <a href="vendors/vendor2-bakary-tech/" class="vendor-card">
+                <div class="vendor-icon">💻</div>
+                <div class="vendor-name">Bakary Tech</div>
+                <div class="vendor-category">Électronique & Tech</div>
+            </a>
+            
+            <a href="vendors/vendor3-fatoumata-bijoux/" class="vendor-card">
+                <div class="vendor-icon">💎</div>
+                <div class="vendor-name">Fatoumata Bijoux</div>
+                <div class="vendor-category">Bijoux artisanaux</div>
+            </a>
+            
+            <a href="vendors/vendor4-marie-epicerie/" class="vendor-card">
+                <div class="vendor-icon">🛒</div>
+                <div class="vendor-name">Marie Épicerie</div>
+                <div class="vendor-category">Produits alimentaires</div>
+            </a>
+            
+            <a href="vendors/vendor5-ibrahim-electronique/" class="vendor-card">
+                <div class="vendor-icon">📱</div>
+                <div class="vendor-name">Ibrahim Électronique</div>
+                <div class="vendor-category">Smartphones & Accessoires</div>
+            </a>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>Rejoignez INLY</h3>
+            <p>Créez votre page de vente en ligne simplement. Solution adaptée aux vendeurs WhatsApp en Côte d'Ivoire.</p>
+            <a href="https://wa.me/2250715884979?text=Bonjour%20INLY%20!%20Je%20veux%20créer%20ma%20page%20de%20vente" class="footer-cta" target="_blank">
+                💬 Nous contacter
+            </a>
+            <div class="footer-bottom">
+                <p>© 2026 INLY - Pages de vente professionnelles</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
