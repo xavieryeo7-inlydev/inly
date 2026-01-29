@@ -1,1 +1,805 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>INLY — Boutique</title>
+<meta name="description" content="Commande rapide via WhatsApp" />
 
+<!-- ==================== DÉBUT DU CSS ==================== -->
+<!-- Le CSS, c'est ce qui rend la page jolie : les couleurs, les tailles, etc. -->
+<style>
+  /* Définition des couleurs principales qu'on va utiliser partout */
+  :root{
+    --bg:#0f1724;           /* Couleur de fond principale (bleu très foncé) */
+    --card:#0b1220;         /* Couleur des cartes de produits (encore plus foncé) */
+    --muted:#9aa4b2;        /* Couleur grise pour les textes secondaires */
+    --accent:#06b6d4;       /* Couleur d'accent (bleu clair) pour les boutons */
+    --accent-2:#7c3aed;     /* Deuxième couleur d'accent (violet) */
+    --radius:12px;          /* Arrondi des coins */
+    --shadow: 0 6px 18px rgba(2,6,23,0.6);  /* Ombre portée */
+    --text:#e6eef6;         /* Couleur du texte principal (blanc cassé) */
+  }
+  
+  /* Réinitialisation de tous les éléments pour partir sur une base propre */
+  *{box-sizing:border-box;margin:0;padding:0}
+  
+  /* Style du corps de la page */
+  html,body{
+    height:100%;
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    color:var(--text);  /* Utilise la couleur de texte définie plus haut */
+    background:linear-gradient(180deg,#071024 0%, #071827 100%);  /* Dégradé de fond */
+  }
+  
+  /* Conteneur principal qui centre tout le contenu */
+  .wrap{max-width:1200px;margin:0 auto;padding:18px;padding-bottom:80px}
+  
+  /* ===== HEADER (EN-TÊTE) ===== */
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding:12px 0}
+  .logo{font-size:1.5rem;font-weight:800;color:var(--accent)}
+  .shop-name{font-size:1.2rem;font-weight:700}
+  
+  /* ===== BARRE DE RECHERCHE ===== */
+  .search-wrap{margin-bottom:24px}
+  .search{width:100%;display:flex;align-items:center;background:rgba(255,255,255,0.03);padding:12px 16px;border-radius:12px}
+  .search input{flex:1;background:transparent;border:0;color:var(--text);outline:none;font-size:1rem}
+  .search svg{margin-right:10px}
+  
+  /* ===== GRILLE DE PRODUITS ===== */
+  /* Sur grand écran, on affiche plusieurs produits côte à côte */
+  /* Sur petit écran (mobile), on affiche moins de produits par ligne */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
+  @media(max-width:640px){.grid{grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:12px}}
+  
+  /* ===== CARTE PRODUIT ===== */
+  /* Chaque produit est affiché dans une "carte" */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    padding:12px;
+    border-radius:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    box-shadow:0 4px 14px rgba(2,6,23,0.5);
+    border:1px solid rgba(255,255,255,0.03);
+    transition:transform 0.2s;  /* Animation douce quand on survole */
+  }
+  .card:hover{transform:translateY(-4px)}  /* La carte monte légèrement au survol */
+  
+  /* Image du produit */
+  .thumb{width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#071827}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  
+  /* Textes du produit */
+  .title{font-weight:600;font-size:0.95rem}
+  .price{color:var(--accent);font-weight:700;font-size:1.1rem}
+  .meta{color:var(--muted);font-size:0.85rem}
+  
+  /* ===== CONTRÔLES DE QUANTITÉ ===== */
+  /* Les boutons + et - pour changer la quantité */
+  .qty-controls{display:flex;align-items:center;gap:8px;margin-top:auto}
+  .qty-btn{
+    width:32px;height:32px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+  }
+  .qty-btn:hover{background:rgba(255,255,255,0.1)}
+  .qty-btn:active{transform:scale(0.95)}
+  .qty-input{
+    width:50px;padding:6px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03);
+    color:var(--text);
+    text-align:center;
+    border-radius:8px;
+    font-size:0.95rem;
+  }
+  
+  /* ===== BOUTON COMMANDER ===== */
+  .order-btn{
+    width:100%;padding:10px;
+    border-radius:10px;
+    background:var(--accent);
+    color:#042;
+    font-weight:700;
+    border:0;
+    cursor:pointer;
+    margin-top:8px;
+    font-size:0.9rem;
+  }
+  .order-btn:hover{opacity:0.9}
+  .order-btn:active{transform:translateY(1px)}
+  
+  /* ===== BOUTON FLOTTANT (LE PANIER) ===== */
+  /* Ce bouton flotte en bas à droite et montre le nombre d'articles */
+  .floating-cart{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    background:var(--accent);
+    color:#042;
+    padding:14px 24px;
+    border-radius:50px;
+    box-shadow:0 8px 24px rgba(6,182,212,0.4);
+    cursor:pointer;
+    font-weight:700;
+    font-size:0.95rem;
+    z-index:999;
+    display:none;  /* Caché par défaut, s'affiche quand on ajoute un produit */
+    transition:all 0.3s ease;
+    animation:pulse 2s infinite;  /* Animation qui pulse pour attirer l'attention */
+  }
+  .floating-cart.visible{display:block}  /* Devient visible quand on ajoute cette classe */
+  .floating-cart:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 32px rgba(6,182,212,0.5);
+  }
+  
+  /* Animation qui fait "pulser" le bouton */
+  @keyframes pulse{
+    0%, 100%{box-shadow:0 8px 24px rgba(6,182,212,0.4)}
+    50%{box-shadow:0 8px 32px rgba(6,182,212,0.7)}
+  }
+  
+  /* ===== QUICKBAR (FORMULAIRE DE COMMANDE) ===== */
+  /* C'est le grand panneau qui monte du bas quand on clique sur le bouton flottant */
+  .quickbar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    background:linear-gradient(180deg, rgba(11,18,32,0.98), rgba(11,18,32,1));
+    padding:24px 16px;
+    box-shadow:0 -8px 32px rgba(2,6,23,0.9);
+    backdrop-filter:blur(10px);
+    border-top:2px solid var(--accent);
+    z-index:1000;
+    transform:translateY(100%);  /* Caché en dessous de l'écran par défaut */
+    transition:transform 0.3s ease;
+    max-height:80vh;
+    overflow-y:auto;
+  }
+  .quickbar.visible{transform:translateY(0)}  /* Monte quand on ajoute cette classe */
+  
+  .quickbar-content{max-width:1200px;margin:0 auto;position:relative}
+  
+  /* Bouton pour fermer la quickbar */
+  .quickbar-close{
+    position:absolute;
+    top:-8px;right:0;
+    width:36px;height:36px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--text);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+    font-weight:700;
+    transition:all 0.2s;
+  }
+  .quickbar-close:hover{
+    background:rgba(255,255,255,0.2);
+    transform:rotate(90deg);  /* Tourne légèrement au survol */
+  }
+  
+  /* Résumé de la commande */
+  .quickbar-summary{margin-bottom:16px;font-size:0.9rem}
+  .quickbar-badge{
+    background:rgba(6,182,212,0.15);
+    padding:10px 14px;
+    border-radius:8px;
+    display:inline-block;
+    margin-bottom:12px;
+    color:var(--accent);
+    font-weight:600;
+    line-height:1.5;
+  }
+  
+  /* Formulaire pour les infos du client */
+  .quickbar-form{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .quickbar-input{
+    padding:12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    font-size:0.9rem;
+  }
+  .quickbar-input::placeholder{color:var(--muted)}
+  
+  /* Bouton final de validation */
+  .quickbar-btn{
+    padding:16px;
+    border-radius:10px;
+    background:var(--accent);
+    color:#042;
+    font-weight:700;
+    border:0;
+    cursor:pointer;
+    font-size:1.05rem;
+    width:100%;
+  }
+  .quickbar-btn:hover{opacity:0.9}
+  
+  /* ===== PAGINATION ===== */
+  /* Les boutons pour changer de page de produits */
+  .pagination{display:flex;justify-content:center;align-items:center;gap:10px;margin:30px 0}
+  .page-btn{
+    padding:10px 20px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03);
+    color:var(--text);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.9rem;
+  }
+  .page-btn:hover:not(:disabled){background:rgba(255,255,255,0.1)}
+  .page-btn:disabled{opacity:0.3;cursor:not-allowed}
+  .page-num{
+    width:40px;height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.9rem;
+  }
+  .page-num:hover{background:rgba(255,255,255,0.1)}
+  .page-num.active{background:var(--accent);color:#042;border-color:var(--accent)}
+  
+  /* ===== FOOTER ===== */
+  footer{
+    margin-top:60px;
+    padding:24px 0;
+    border-top:1px solid rgba(255,255,255,0.05);
+    text-align:center;
+    color:var(--muted);
+    font-size:0.85rem;
+    line-height:1.6;
+  }
+  footer .contact{margin-top:8px;font-weight:600}
+  footer a{color:var(--accent);text-decoration:none;font-weight:700}
+  footer a:hover{text-decoration:underline}
+  
+  /* ===== VARIANTES (COULEURS ET TAILLES) ===== */
+  .variants{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .variant-label{font-size:0.8rem;color:var(--muted);margin-bottom:4px}
+  .variant-select{
+    padding:8px 12px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.9rem;
+    width:100%;
+  }
+  .variant-select:hover{background:rgba(255,255,255,0.1)}
+  .variant-select option{background:#0b1220;color:var(--text)}
+  
+  /* ===== MESSAGE QUAND AUCUN PRODUIT TROUVÉ ===== */
+  .no-results{padding:40px;text-align:center;color:var(--muted)}
+</style>
+<!-- ==================== FIN DU CSS ==================== -->
+
+</head>
+<body>
+<!-- ==================== DÉBUT DU HTML (LA STRUCTURE) ==================== -->
+<div class="wrap">
+  
+  <!-- JAVASCRIPT QUI CONTIENT LES DONNÉES DU VENDEUR -->
+  <!-- C'est ici qu'on va changer le nom, le téléphone, et les produits -->
+  <script>
+    window.SELLER = {
+      "name":"Aminata Mode",
+      "phone":"2250701234567",
+      "city":"Abidjan",
+      "currency":"FCFA",
+      "products":[
+  {"id":"p1","title":"Robe Wax élégante","price":15000,"img":"https://via.placeholder.com/600x600/FF69B4/fff?text=Robe","unit":"pièce"},
+  {"id":"p2","title":"Ensemble Pagne","price":25000,"img":"https://via.placeholder.com/600x600/9370DB/fff?text=Ensemble","unit":"pièce"},
+  {"id":"p3","title":"Chemisier en Soie","price":12000,"img":"https://via.placeholder.com/600x600/87CEEB/fff?text=Chemisier","unit":"pièce"}
+]
+    };
+    
+    const PRODUCTS_PER_PAGE = 12;
+  </script>
+
+  <!-- EN-TÊTE DE LA PAGE -->
+  <header>
+    <div class="logo">INLY</div>
+    <div class="shop-name" id="shopName"></div>
+  </header>
+
+  <!-- BARRE DE RECHERCHE -->
+  <div class="search-wrap">
+    <div class="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="search" placeholder="Rechercher un produit...">
+    </div>
+  </div>
+
+  <!-- GRILLE DES PRODUITS (remplie automatiquement par JavaScript) -->
+  <div id="products" class="grid"></div>
+  <div id="noResults" class="no-results" style="display:none">Aucun produit trouvé</div>
+
+  <!-- PAGINATION -->
+  <div id="pagination" class="pagination">
+    <button id="prevBtn" class="page-btn">← Précédent</button>
+    <div id="pageNumbers" style="display:flex;gap:8px"></div>
+    <button id="nextBtn" class="page-btn">Suivant →</button>
+  </div>
+
+  <!-- BOUTON FLOTTANT DU PANIER -->
+  <div id="floatingCart" class="floating-cart"></div>
+
+  <!-- QUICKBAR (FORMULAIRE DE COMMANDE) -->
+  <div id="quickbar" class="quickbar">
+    <div class="quickbar-content">
+      <button id="quickbarClose" class="quickbar-close">✕</button>
+      <div class="quickbar-summary">
+        <div style="font-weight:600;margin-bottom:6px">Votre commande</div>
+        <div class="quickbar-badge" id="quickSummary"></div>
+      </div>
+      <div class="quickbar-form">
+        <input id="customerName" class="quickbar-input" type="text" placeholder="Votre nom *" required>
+        <input id="customerContact" class="quickbar-input" type="tel" placeholder="Votre contact *" required>
+        <input id="customerAddress" class="quickbar-input" type="text" placeholder="Adresse / Points de repère *" required>
+      </div>
+      <button id="quickOrder" class="quickbar-btn">Commander sur WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>INLY — Pages pro légères pour vendeurs informels</div>
+    <div class="contact">
+      <a href="https://wa.me/2250715884979" target="_blank">+225 07 15 88 49 79</a> • © INLY
+    </div>
+  </footer>
+</div>
+
+<!-- ==================== DÉBUT DU JAVASCRIPT (LA LOGIQUE) ==================== -->
+<!-- Le JavaScript fait fonctionner toute la page : afficher les produits, gérer le panier, etc. -->
+<script>
+(function(){
+  // Récupérer les données du vendeur qu'on a définies plus haut
+  const seller = window.SELLER;
+  const PRODUCTS_PER_PAGE = window.PRODUCTS_PER_PAGE || 12;
+  
+  // Le panier : un objet qui va stocker les produits ajoutés
+  const cart = {};
+  
+  // Page actuelle (on commence à la page 1)
+  let currentPage = 1;
+  
+  // Liste des produits à afficher (peut être filtrée par la recherche)
+  let filteredProducts = seller.products;
+  
+  // Afficher le nom du vendeur dans le header
+  document.getElementById('shopName').textContent = seller.name;
+  
+  // Récupérer tous les éléments HTML qu'on va manipuler
+  const productsEl = document.getElementById('products');
+  const noResultsEl = document.getElementById('noResults');
+  const searchInput = document.getElementById('search');
+  const paginationEl = document.getElementById('pagination');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const pageNumbersEl = document.getElementById('pageNumbers');
+  const quickbar = document.getElementById('quickbar');
+  const floatingCart = document.getElementById('floatingCart');
+  const quickSummary = document.getElementById('quickSummary');
+  const customerName = document.getElementById('customerName');
+  const customerContact = document.getElementById('customerContact');
+  const customerAddress = document.getElementById('customerAddress');
+  const quickOrderBtn = document.getElementById('quickOrder');
+  const quickbarClose = document.getElementById('quickbarClose');
+
+  // Fonction pour formater les prix (ajoute des espaces : 15000 devient 15 000)
+  function fmt(n){ return n.toLocaleString() + ' ' + seller.currency; }
+  
+  // Fonction pour protéger contre les injections de code malveillant
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  // FONCTION PRINCIPALE : Afficher les produits sur la page
+  function renderProducts(){
+    // Calculer combien de pages on a au total
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    
+    // Calculer quels produits afficher sur cette page
+    const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const list = filteredProducts.slice(start, start + PRODUCTS_PER_PAGE);
+    
+    // Si aucun produit trouvé, afficher un message
+    if(filteredProducts.length === 0){
+      productsEl.innerHTML = '';
+      noResultsEl.style.display = 'block';
+      paginationEl.style.display = 'none';
+      return;
+    }
+    
+    // Sinon, cacher le message "aucun produit"
+    noResultsEl.style.display = 'none';
+    paginationEl.style.display = totalPages > 1 ? 'flex' : 'none';
+    
+    // Créer le HTML pour chaque produit
+    productsEl.innerHTML = list.map(p => {
+      const cartItem = cart[p.id] || {qty: 0};
+      let variantsHTML = '';
+      
+      // Si le produit a des variantes (couleur, taille), créer les menus déroulants
+      if(p.variants){
+        variantsHTML = '<div class="variants">';
+        
+        if(p.variants.colors){
+          variantsHTML += '<div><div class="variant-label">Couleur:</div>';
+          variantsHTML += `<select class="variant-select" data-id="${p.id}" data-type="color">`;
+          variantsHTML += '<option value="">-- Choisir --</option>';
+          p.variants.colors.forEach(c => {
+            const colorName = c.name || c;
+            const selected = cartItem.color === colorName ? 'selected' : '';
+            variantsHTML += `<option value="${escapeHtml(colorName)}" ${selected}>${escapeHtml(colorName)}</option>`;
+          });
+          variantsHTML += '</select></div>';
+        }
+        
+        if(p.variants.sizes){
+          variantsHTML += '<div><div class="variant-label">Taille:</div>';
+          variantsHTML += `<select class="variant-select" data-id="${p.id}" data-type="size">`;
+          variantsHTML += '<option value="">-- Choisir --</option>';
+          p.variants.sizes.forEach(s => {
+            const selected = cartItem.size === s ? 'selected' : '';
+            variantsHTML += `<option value="${escapeHtml(s)}" ${selected}>${escapeHtml(s)}</option>`;
+          });
+          variantsHTML += '</select></div>';
+        }
+        
+        variantsHTML += '</div>';
+      }
+      
+      // Retourner le HTML de la carte produit
+      return `
+      <article class="card">
+        <div class="thumb">
+          <img src="${p.img}" alt="${escapeHtml(p.title)}" loading="lazy">
+        </div>
+        <div class="title">${escapeHtml(p.title)}</div>
+        <div class="meta">${escapeHtml(p.unit)}</div>
+        <div class="price">${fmt(p.price)}</div>
+        ${variantsHTML}
+        <div class="qty-controls">
+          <button class="qty-btn" data-action="dec" data-id="${p.id}">−</button>
+          <input class="qty-input" type="number" min="0" value="${cartItem.qty}" data-id="${p.id}">
+          <button class="qty-btn" data-action="inc" data-id="${p.id}">+</button>
+        </div>
+        <button class="order-btn" data-id="${p.id}">Commander</button>
+      </article>
+    `}).join('');
+    
+    // Afficher la pagination
+    renderPagination(totalPages);
+  }
+
+  // Fonction pour afficher les boutons de pagination
+  function renderPagination(totalPages){
+    if(totalPages <= 1){
+      paginationEl.style.display = 'none';
+      return;
+    }
+    
+    paginationEl.style.display = 'flex';
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+    
+    pageNumbersEl.innerHTML = '';
+    
+    const maxVisible = 5;
+    let pages = [];
+    
+    if(totalPages <= maxVisible){
+      pages = Array.from({length: totalPages}, (_, i) => i + 1);
+    } else {
+      pages.push(1);
+      
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+      
+      if(start > 2) {
+        const dot = document.createElement('span');
+        dot.textContent = '...';
+        dot.style.padding = '0 8px';
+        dot.style.color = 'var(--muted)';
+        pageNumbersEl.appendChild(dot);
+      }
+      
+      for(let i = start; i <= end; i++){
+        if(!pages.includes(i)) pages.push(i);
+      }
+      
+      if(end < totalPages - 1){
+        const dot = document.createElement('span');
+        dot.textContent = '...';
+        dot.style.padding = '0 8px';
+        dot.style.color = 'var(--muted)';
+        pageNumbersEl.appendChild(dot);
+      }
+      
+      if(!pages.includes(totalPages)) pages.push(totalPages);
+    }
+    
+    pages.forEach(i => {
+      const btn = document.createElement('div');
+      btn.className = `page-num ${i === currentPage ? 'active' : ''}`;
+      btn.textContent = i;
+      btn.onclick = () => { 
+        currentPage = i; 
+        renderProducts(); 
+        window.scrollTo({top: 0, behavior: 'smooth'}); 
+      };
+      pageNumbersEl.appendChild(btn);
+    });
+  }
+
+  // Bouton page précédente
+  prevBtn.addEventListener('click', () => {
+    if(currentPage > 1){
+      currentPage--;
+      renderProducts();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  });
+
+  // Bouton page suivante
+  nextBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    if(currentPage < totalPages){
+      currentPage++;
+      renderProducts();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  });
+
+  // Fonction pour mettre à jour le panier
+  function updateCart(id, qty, color, size){
+    qty = Math.max(0, parseInt(qty) || 0);
+    if(qty === 0){
+      delete cart[id];
+    } else {
+      cart[id] = {qty, color, size};
+    }
+    updateFloatingCart();
+  }
+
+  // Fonction pour mettre à jour le bouton flottant
+  function updateFloatingCart(){
+    const items = Object.keys(cart).filter(k => cart[k].qty > 0);
+    
+    if(items.length === 0){
+      floatingCart.classList.remove('visible');
+      return;
+    }
+    
+    floatingCart.classList.add('visible');
+    
+    const total = items.reduce((sum, id) => {
+      const p = seller.products.find(x => x.id === id);
+      return sum + (p.price * cart[id].qty);
+    }, 0);
+    
+    const itemCount = items.reduce((sum, id) => sum + cart[id].qty, 0);
+    const itemText = itemCount === 1 ? 'article' : 'articles';
+    
+    floatingCart.textContent = `${itemCount} ${itemText} • ${fmt(total)}`;
+  }
+
+  // Fonction pour afficher la quickbar
+  function showQuickbar(){
+    const items = Object.keys(cart).filter(k => cart[k].qty > 0);
+    
+    const lines = items.map(id => {
+      const p = seller.products.find(x => x.id === id);
+      const item = cart[id];
+      let details = `${item.qty} x ${p.title}`;
+      if(item.color) details += ` (${item.color})`;
+      if(item.size) details += ` - Taille ${item.size}`;
+      return details;
+    });
+    
+    const total = items.reduce((sum, id) => {
+      const p = seller.products.find(x => x.id === id);
+      return sum + (p.price * cart[id].qty);
+    }, 0);
+    
+    quickSummary.innerHTML = `${lines.join(' • ')}<br><strong>Total: ${fmt(total)}</strong>`;
+    quickbar.classList.add('visible');
+  }
+
+  // Fonction pour fermer la quickbar
+  function closeQuickbar(){
+    quickbar.classList.remove('visible');
+  }
+
+  // Fonction pour construire le message WhatsApp
+  function buildMessage(products, name, contact, address){
+    let lines = [`Bonjour ${seller.name},`, '', 'Je souhaite commander:', ''];
+    
+    products.forEach(({product, item}) => {
+      let line = `• ${item.qty} x ${product.title}`;
+      if(item.color) line += ` (Couleur: ${item.color})`;
+      if(item.size) line += ` - Taille: ${item.size}`;
+      line += ` = ${fmt(product.price * item.qty)}`;
+      lines.push(line);
+    });
+    
+    const total = products.reduce((sum, {product, item}) => sum + (product.price * item.qty), 0);
+    lines.push('', `*Total: ${fmt(total)}*`, '');
+    lines.push(`*Client:* ${name}`);
+    lines.push(`*Contact:* ${contact}`);
+    lines.push(`*Adresse:* ${address}`);
+    lines.push('', `Ville: ${seller.city}`);
+    
+    return encodeURIComponent(lines.join('\n'));
+  }
+
+  // Gestion des clics sur les produits
+  productsEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action], .order-btn');
+    if(!btn) return;
+    
+    const id = btn.getAttribute('data-id');
+    
+    // Quand on clique sur "Commander"
+    if(btn.classList.contains('order-btn')){
+      const product = seller.products.find(p => p.id === id);
+      const input = productsEl.querySelector(`.qty-input[data-id="${id}"]`);
+      let qty = parseInt(input.value) || 0;
+      
+      if(qty === 0){
+        qty = 1;
+        input.value = 1;
+      }
+      
+      const item = cart[id] || {qty: 0};
+      
+      if(product.variants){
+        if(product.variants.colors){
+          const colorSelect = productsEl.querySelector(`.variant-select[data-id="${id}"][data-type="color"]`);
+          if(colorSelect && !colorSelect.value){
+            alert('Veuillez sélectionner une couleur');
+            return;
+          }
+          item.color = colorSelect ? colorSelect.value : null;
+        }
+        if(product.variants.sizes){
+          const sizeSelect = productsEl.querySelector(`.variant-select[data-id="${id}"][data-type="size"]`);
+          if(sizeSelect && !sizeSelect.value){
+            alert('Veuillez sélectionner une taille');
+            return;
+          }
+          item.size = sizeSelect ? sizeSelect.value : null;
+        }
+      }
+      
+      updateCart(id, qty, item.color, item.size);
+      showQuickbar();
+      return;
+    }
+    
+    // Gestion des boutons + et -
+    const action = btn.getAttribute('data-action');
+    const input = productsEl.querySelector(`.qty-input[data-id="${id}"]`);
+    let val = parseInt(input.value) || 0;
+    
+    if(action === 'inc') val++;
+    if(action === 'dec') val--;
+    
+    val = Math.max(0, val);
+    input.value = val;
+    
+    const item = cart[id] || {};
+    updateCart(id, val, item.color, item.size);
+  });
+
+  // Gestion du changement de variantes
+  productsEl.addEventListener('change', e => {
+    if(e.target.classList.contains('variant-select')){
+      const id = e.target.getAttribute('data-id');
+      const type = e.target.getAttribute('data-type');
+      const value = e.target.value;
+      
+      if(!cart[id]) cart[id] = {qty: 0};
+      cart[id][type] = value;
+    }
+  });
+
+  // Gestion de la modification manuelle de quantité
+  productsEl.addEventListener('input', e => {
+    if(!e.target.classList.contains('qty-input')) return;
+    const id = e.target.getAttribute('data-id');
+    const item = cart[id] || {};
+    updateCart(id, e.target.value, item.color, item.size);
+  });
+
+  // Recherche de produits
+  searchInput.addEventListener('input', e => {
+    const term = e.target.value.trim().toLowerCase();
+    filteredProducts = seller.products.filter(p => p.title.toLowerCase().includes(term));
+    currentPage = 1;
+    renderProducts();
+  });
+
+  // Clic sur le bouton flottant
+  floatingCart.addEventListener('click', showQuickbar);
+  
+  // Clic sur le bouton fermer
+  quickbarClose.addEventListener('click', closeQuickbar);
+
+  // Validation de la commande
+  quickOrderBtn.addEventListener('click', () => {
+    const name = customerName.value.trim();
+    const contact = customerContact.value.trim();
+    const address = customerAddress.value.trim();
+    
+    if(!name || !contact || !address){
+      alert('Veuillez remplir tous les champs');
+      return;
+    }
+    
+    for(let id of Object.keys(cart)){
+      if(cart[id].qty === 0) continue;
+      const product = seller.products.find(p => p.id === id);
+      if(product.variants){
+        if(product.variants.colors && !cart[id].color){
+          alert(`Veuillez sélectionner une couleur pour ${product.title}`);
+          return;
+        }
+        if(product.variants.sizes && !cart[id].size){
+          alert(`Veuillez sélectionner une taille pour ${product.title}`);
+          return;
+        }
+      }
+    }
+    
+    const items = Object.keys(cart).filter(k => cart[k].qty > 0).map(id => ({
+      product: seller.products.find(p => p.id === id),
+      item: cart[id]
+    }));
+    
+    const msg = buildMessage(items, name, contact, address);
+    window.open(`https://wa.me/${seller.phone.replace(/\D/g,'')}?text=${msg}`, '_blank');
+    
+    Object.keys(cart).forEach(k => delete cart[k]);
+    customerName.value = '';
+    customerContact.value = '';
+    customerAddress.value = '';
+    closeQuickbar();
+    renderProducts();
+    updateFloatingCart();
+  });
+
+  // Lancer l'affichage initial
+  renderProducts();
+})();
+</script>
+<!-- ==================== FIN DU JAVASCRIPT ==================== -->
+
+</body>
+</html>
